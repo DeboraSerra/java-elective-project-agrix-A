@@ -9,6 +9,6 @@ public class FarmNotFound extends NotFound {
    * Instantiates a new Farm not found.
    */
   public FarmNotFound() {
-    super("Fazenda não encontrada");
+    super("Fazenda não encontrada!");
   }
 }
