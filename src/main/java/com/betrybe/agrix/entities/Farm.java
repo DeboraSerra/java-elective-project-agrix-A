@@ -4,7 +4,10 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * The type Farm.
@@ -13,15 +16,14 @@ import jakarta.persistence.Table;
 @Table(name = "farms")
 public class Farm {
 
+  @OneToMany(mappedBy = "farm")
+  private final List<Crop> crops = new ArrayList<>();
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
   private String name;
   private Float size;
 
-  /**
-   * Instantiates a new Farm.
-   */
   public Farm() {
   }
 
@@ -88,5 +90,14 @@ public class Farm {
    */
   public void setSize(Float size) {
     this.size = size;
+  }
+
+  /**
+   * Gets crops.
+   *
+   * @return the crops
+   */
+  public List<Crop> getCrops() {
+    return crops;
   }
 }

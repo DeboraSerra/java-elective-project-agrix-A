@@ -1,7 +1,10 @@
 package com.betrybe.agrix.controller;
 
+import com.betrybe.agrix.dtos.CropCreationDto;
+import com.betrybe.agrix.dtos.CropDto;
 import com.betrybe.agrix.dtos.FarmCreationDto;
 import com.betrybe.agrix.dtos.FarmDto;
+import com.betrybe.agrix.entities.Crop;
 import com.betrybe.agrix.entities.Farm;
 import com.betrybe.agrix.exceptions.FarmNotFound;
 import com.betrybe.agrix.service.FarmService;
@@ -106,5 +109,36 @@ public class FarmController {
   public ResponseEntity<FarmDto> deleteFarmById(@PathVariable Long id) throws FarmNotFound {
     Farm farm = farmService.deleteFarm(id);
     return ResponseEntity.status(HttpStatus.OK).body(FarmDto.fromEntity(farm));
+  }
+
+  /**
+   * Create crop response entity.
+   *
+   * @param farmId the farm id
+   * @param body   the body
+   * @return the response entity
+   * @throws FarmNotFound the farm not found
+   */
+  @PostMapping("/{farmId}/crops")
+  public ResponseEntity<CropDto> createCrop(@PathVariable Long farmId,
+      @RequestBody CropCreationDto body)
+      throws FarmNotFound {
+    Crop crop = farmService.createCrop(farmId, body.toEntity());
+    return ResponseEntity.status(HttpStatus.CREATED).body(CropDto.fromEntity(crop));
+  }
+
+  /**
+   * Gets crops by farm id.
+   *
+   * @param farmId the farm id
+   * @return the crops by farm id
+   * @throws FarmNotFound the farm not found
+   */
+  @GetMapping("/{farmId}/crops")
+  public ResponseEntity<List<CropDto>> getCropsByFarmId(@PathVariable Long farmId)
+      throws FarmNotFound {
+    List<Crop> crops = farmService.getAllCropsByFarmId(farmId);
+    List<CropDto> cropDtos = crops.stream().map(CropDto::fromEntity).toList();
+    return ResponseEntity.status(HttpStatus.OK).body(cropDtos);
   }
 }

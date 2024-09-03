@@ -1,7 +1,10 @@
 package com.betrybe.agrix.service;
 
+import com.betrybe.agrix.entities.Crop;
 import com.betrybe.agrix.entities.Farm;
+import com.betrybe.agrix.exceptions.CropNotFound;
 import com.betrybe.agrix.exceptions.FarmNotFound;
+import com.betrybe.agrix.repository.CropRepository;
 import com.betrybe.agrix.repository.FarmRepository;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,19 +20,22 @@ import org.springframework.stereotype.Service;
 public class FarmService {
 
   private final FarmRepository farmRepository;
+  private final CropRepository cropRepository;
 
   /**
    * Instantiates a new Farm service.
    *
    * @param farmRepository the farm repository
+   * @param cropRepository the crop repository
    */
   @Autowired
-  public FarmService(FarmRepository farmRepository) {
+  public FarmService(FarmRepository farmRepository, CropRepository cropRepository) {
     this.farmRepository = farmRepository;
+    this.cropRepository = cropRepository;
   }
 
   /**
-   * Create farm farm.
+   * Create farm.
    *
    * @param farm the farm
    * @return the farm
@@ -59,11 +65,11 @@ public class FarmService {
   public List<Farm> getAllFarms(int pageNum, int pageSize) {
     Pageable pageable = PageRequest.of(pageNum, pageSize);
     Page<Farm> page = farmRepository.findAll(pageable);
-    return page.stream().toList();
+    return page.toList();
   }
 
   /**
-   * Update farm farm.
+   * Update farm.
    *
    * @param id   the id
    * @param farm the farm
@@ -78,7 +84,7 @@ public class FarmService {
   }
 
   /**
-   * Delete farm farm.
+   * Delete farm.
    *
    * @param id the id
    * @return the farm
@@ -88,5 +94,55 @@ public class FarmService {
     Farm farm = getFarmById(id);
     farmRepository.deleteById(id);
     return farm;
+  }
+
+  /**
+   * Create crop.
+   *
+   * @param farmId the farm id
+   * @param crop   the crop
+   * @return the crop
+   * @throws FarmNotFound the farm not found
+   */
+  public Crop createCrop(Long farmId, Crop crop) throws FarmNotFound {
+    Farm farm = getFarmById(farmId);
+    crop.setFarm(farm);
+    return cropRepository.save(crop);
+  }
+
+  /**
+   * Gets all crops by farm id.
+   *
+   * @param farmId the farm id
+   * @return the all crops by farm id
+   * @throws FarmNotFound the farm not found
+   */
+  public List<Crop> getAllCropsByFarmId(Long farmId) throws FarmNotFound {
+    Farm farm = getFarmById(farmId);
+    return farm.getCrops();
+  }
+
+  /**
+   * Gets all crops.
+   *
+   * @param pageNum  the page num
+   * @param pageSize the page size
+   * @return the all crops
+   */
+  public List<Crop> getAllCrops(int pageNum, int pageSize) {
+    Pageable pageable = PageRequest.of(pageNum, pageSize);
+    Page<Crop> page = cropRepository.findAll(pageable);
+    return page.toList();
+  }
+
+  /**
+   * Gets crop by id.
+   *
+   * @param cropId the crop id
+   * @return the crop by id
+   * @throws CropNotFound the crop not found
+   */
+  public Crop getCropById(Long cropId) throws CropNotFound {
+    return cropRepository.findById(cropId).orElseThrow(CropNotFound::new);
   }
 }
